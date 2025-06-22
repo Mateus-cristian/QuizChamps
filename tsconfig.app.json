@@ -6,7 +6,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-
+    "types": ["node", "vite/client"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -21,7 +21,19 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* 🔥 Alias de caminho */
+    "baseUrl": ".",                 
+    "paths": {
+      "~/*": ["app/*"]  ,
+      "@react-router/dev/routes": ["./node_modules/@react-router/dev/dist/routes.d.ts"],
+      "react-router": ["./node_modules/react-router/dist/index.d.ts"],           
+    }
   },
-  "include": ["app"]
+ "include": [
+    "**/*",
+    "**/.server/**/*",
+    "**/.client/**/*",
+    ".react-router/types/**/*"]
 }
