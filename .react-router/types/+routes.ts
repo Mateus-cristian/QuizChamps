@@ -13,7 +13,13 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/login": {
+  "/auth": {
+    params: {};
+  };
+  "/auth/sign-in": {
+    params: {};
+  };
+  "/auth/sign-up": {
     params: {};
   };
 };
@@ -21,14 +27,26 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login";
+    page: "/" | "/auth" | "/auth/sign-in" | "/auth/sign-up";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
   };
-  "routes/login.tsx": {
-    id: "routes/login";
-    page: "/login";
+  "routes/auth.tsx": {
+    id: "routes/auth";
+    page: "/auth" | "/auth/sign-in" | "/auth/sign-up";
+  };
+  "routes/auth.sign-in.tsx": {
+    id: "routes/auth.sign-in";
+    page: "/auth/sign-in";
+  };
+  "routes/auth.sign-up.tsx": {
+    id: "routes/auth.sign-up";
+    page: "/auth/sign-up";
+  };
+  "routes/auth._index.tsx": {
+    id: "routes/auth._index";
+    page: "/auth";
   };
 };
