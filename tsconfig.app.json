@@ -24,9 +24,9 @@
     "noUncheckedSideEffectImports": true,
 
     /* 🔥 Alias de caminho */
-    "baseUrl": ".",                 
-    "paths": {
-      "~/*": ["app/*"]  ,
+      "baseUrl": ".",
+      "paths": {
+      "@/*": ["./app/*"],
       "@react-router/dev/routes": ["./node_modules/@react-router/dev/dist/routes.d.ts"],
       "react-router": ["./node_modules/react-router/dist/index.d.ts"],           
     }
