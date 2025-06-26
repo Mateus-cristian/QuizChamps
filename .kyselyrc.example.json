@@ -1,0 +1,5 @@
+{
+  "outFile": "app/db/schema.ts",
+  "dialect": "postgres",
+  "connectionString": ""
+}
