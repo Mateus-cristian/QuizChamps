@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 .env
-.kyaselyrc.json
+.kyselyrc.json
 
 node_modules
 dist

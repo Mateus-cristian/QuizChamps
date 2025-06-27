@@ -10,7 +10,7 @@
     "typecheck": "react-router typegen && tsc",
     "migrate:up": "tsx app/db/migrate.ts up",
     "migrate:down": "tsx app/db/migrate.ts down",
-    "kysely:migrations": "yarn tsx app/db/run-migrations.ts",
+    "kysely:migrations": "yarn tsx app/db/migrate.ts",
     "kysely:generate": "kysely-codegen --out-file app/db/schema.ts"
   },
   "dependencies": {
