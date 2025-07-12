@@ -16,6 +16,19 @@ type Pages = {
   "/auth": {
     params: {};
   };
+  "/auth/reset-password/:token": {
+    params: {
+      "token": string;
+    };
+  };
+  "/auth/verify-token/:token": {
+    params: {
+      "token": string;
+    };
+  };
+  "/auth/forgot-password": {
+    params: {};
+  };
   "/auth/sign-in": {
     params: {};
   };
@@ -27,7 +40,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth" | "/auth/sign-in" | "/auth/sign-up";
+    page: "/" | "/auth" | "/auth/reset-password/:token" | "/auth/verify-token/:token" | "/auth/forgot-password" | "/auth/sign-in" | "/auth/sign-up";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -35,7 +48,19 @@ type RouteFiles = {
   };
   "routes/auth.tsx": {
     id: "routes/auth";
-    page: "/auth" | "/auth/sign-in" | "/auth/sign-up";
+    page: "/auth" | "/auth/reset-password/:token" | "/auth/verify-token/:token" | "/auth/forgot-password" | "/auth/sign-in" | "/auth/sign-up";
+  };
+  "routes/auth.reset-password.$token.tsx": {
+    id: "routes/auth.reset-password.$token";
+    page: "/auth/reset-password/:token";
+  };
+  "routes/auth.verify-token.$token.tsx": {
+    id: "routes/auth.verify-token.$token";
+    page: "/auth/verify-token/:token";
+  };
+  "routes/auth.forgot-password.tsx": {
+    id: "routes/auth.forgot-password";
+    page: "/auth/forgot-password";
   };
   "routes/auth.sign-in.tsx": {
     id: "routes/auth.sign-in";

@@ -1,0 +1,147 @@
+import { SchemaForm } from "@/components/ui/schema-form";
+import { shemaSignUp } from "@/domain/auth.commom";
+import { eyePassword } from "@/domain/auth.ui";
+import { useState } from "react";
+import {
+  redirect,
+  useNavigate,
+  type ActionFunctionArgs,
+  type MetaFunction,
+} from "react-router";
+import { performMutation } from "remix-forms";
+import { registerUser } from "@/domain/auth.server";
+import { sessionStorage } from "@/session";
+import { setFlashMessage } from "@/utils/flash-messages";
+
+export const meta: MetaFunction = () => [
+  { title: "Register" },
+  { name: "register", content: "Page for register user" },
+];
+
+export function loader() {
+  return null;
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const result = await performMutation({
+    request,
+    schema: shemaSignUp,
+    mutation: registerUser,
+  });
+
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+
+  if (!result.success) {
+    return redirect(
+      ".",
+      await setFlashMessage(request, "Usuário não encontrado", "warning")
+    );
+  }
+
+  return redirect("/auth/sign-in", {
+    headers: {
+      "Set-Cookie": await sessionStorage.commitSession(session),
+    },
+  });
+}
+
+export default function Component() {
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  return (
+    <SchemaForm
+      schema={shemaSignUp}
+      labels={{
+        email: "E-mail",
+        name: "Nome",
+        password: "Senha",
+        confirmPassword: "Confirmar senha",
+      }}
+      placeholders={{
+        email: "E-mail",
+        name: "Nome",
+        password: "Senha",
+        confirmPassword: "Confirmar senha",
+      }}
+      method="POST"
+    >
+      {({ Field, Errors, Button }) => (
+        <>
+          <div className="flex flex-col items-center">
+            <div className="w-full max-w-[384px] flex flex-col gap-4 px-4 mt-12 ">
+              <Field name="name">
+                {({ Label, Input, Errors }) => (
+                  <>
+                    <Label />
+                    <Input />
+                    <Errors />
+                  </>
+                )}
+              </Field>
+              <Field name="email">
+                {({ Label, Input, Errors }) => (
+                  <>
+                    <Label />
+                    <Input />
+                    <Errors />
+                  </>
+                )}
+              </Field>
+              <Field
+                name="password"
+                label="Senha"
+                type={showPassword ? "text" : "password"}
+              >
+                {({ Label, Input, Errors }) => (
+                  <>
+                    <div className="flex justify-between">
+                      <Label />
+                      <button
+                        className="flex text-blue font-bold cursor-pointer"
+                        type="button"
+                        tabIndex={1}
+                        onClick={() => {
+                          setShowPassword(!showPassword);
+                        }}
+                      >
+                        {eyePassword(showPassword)}
+                        <span className="min-w-[55px] text-right text-lg text-gray-darker font-normal">
+                          {showPassword ? "Ocultar" : "Mostrar"}
+                        </span>
+                      </button>
+                    </div>
+                    <Input autoCapitalize="none" />
+                    <Errors />
+                  </>
+                )}
+              </Field>
+              <Field
+                name="confirmPassword"
+                label="Confirmar senha"
+                type={showPassword ? "text" : "password"}
+              >
+                {({ Label, Input, Errors }) => (
+                  <>
+                    <div className="flex justify-between">
+                      <Label />
+                    </div>
+                    <Input autoCapitalize="none" />
+                    <Errors />
+                  </>
+                )}
+              </Field>
+              <Errors />
+              <Button>Cadastrar</Button>
+              <Button type="button" onClick={() => navigate(-1)}>
+                Voltar
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+    </SchemaForm>
+  );
+}
