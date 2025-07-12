@@ -13,26 +13,23 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/auth": {
-    params: {};
-  };
-  "/auth/reset-password/:token": {
+  "/reset-password/:token": {
     params: {
       "token": string;
     };
   };
-  "/auth/verify-token/:token": {
+  "/verify-token/:token": {
     params: {
       "token": string;
     };
   };
-  "/auth/forgot-password": {
+  "/forgot-password": {
     params: {};
   };
-  "/auth/sign-in": {
+  "/sign-in": {
     params: {};
   };
-  "/auth/sign-up": {
+  "/sign-up": {
     params: {};
   };
 };
@@ -40,38 +37,38 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth" | "/auth/reset-password/:token" | "/auth/verify-token/:token" | "/auth/forgot-password" | "/auth/sign-in" | "/auth/sign-up";
+    page: "/" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
   };
-  "routes/auth.tsx": {
-    id: "routes/auth";
-    page: "/auth" | "/auth/reset-password/:token" | "/auth/verify-token/:token" | "/auth/forgot-password" | "/auth/sign-in" | "/auth/sign-up";
+  "routes/_auth.tsx": {
+    id: "routes/_auth";
+    page: "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up" | "/";
   };
-  "routes/auth.reset-password.$token.tsx": {
-    id: "routes/auth.reset-password.$token";
-    page: "/auth/reset-password/:token";
+  "routes/_auth.reset-password.$token.tsx": {
+    id: "routes/_auth.reset-password.$token";
+    page: "/reset-password/:token";
   };
-  "routes/auth.verify-token.$token.tsx": {
-    id: "routes/auth.verify-token.$token";
-    page: "/auth/verify-token/:token";
+  "routes/_auth.verify-token.$token.tsx": {
+    id: "routes/_auth.verify-token.$token";
+    page: "/verify-token/:token";
   };
-  "routes/auth.forgot-password.tsx": {
-    id: "routes/auth.forgot-password";
-    page: "/auth/forgot-password";
+  "routes/_auth.forgot-password.tsx": {
+    id: "routes/_auth.forgot-password";
+    page: "/forgot-password";
   };
-  "routes/auth.sign-in.tsx": {
-    id: "routes/auth.sign-in";
-    page: "/auth/sign-in";
+  "routes/_auth.sign-in.tsx": {
+    id: "routes/_auth.sign-in";
+    page: "/sign-in";
   };
-  "routes/auth.sign-up.tsx": {
-    id: "routes/auth.sign-up";
-    page: "/auth/sign-up";
+  "routes/_auth.sign-up.tsx": {
+    id: "routes/_auth.sign-up";
+    page: "/sign-up";
   };
-  "routes/auth._index.tsx": {
-    id: "routes/auth._index";
-    page: "/auth";
+  "routes/_auth._index.tsx": {
+    id: "routes/_auth._index";
+    page: "/";
   };
 };

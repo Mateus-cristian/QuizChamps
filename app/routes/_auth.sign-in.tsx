@@ -37,7 +37,7 @@ export default function Component() {
           <Button className="bg-orange cursor-pointer">Login</Button>
           <Button
             type="button"
-            onClick={() => navigate("/auth/sign-up")}
+            onClick={() => navigate("/sign-up")}
             className="bg-orange cursor-pointer w-full"
           >
             Registrar

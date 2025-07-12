@@ -22,7 +22,7 @@ export default function Component() {
           </p>
           <Button
             type="button"
-            onClick={() => navigate("/auth/sign-in")}
+            onClick={() => navigate("/sign-in")}
             className="bg-orange cursor-pointer mt-5"
           >
             Voltar
