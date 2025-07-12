@@ -5,10 +5,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./index.css";
+
+import { getFlashMessage } from "./utils/flash-messages";
+import { ToastProvider } from "./components/toast";
+import type { ToastType } from "react-hot-toast";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -22,6 +27,12 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
+export async function loader({ request }: { request: Request }) {
+  const { flash, headers } = await getFlashMessage(request);
+
+  return Response.json({ flash }, { headers });
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -42,7 +53,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const { flash } = useLoaderData<{
+    flash: { message: string; type: ToastType; timeout: number } | null;
+  }>();
+
+  return (
+    <>
+      <Outlet />
+      <ToastProvider flash={flash} />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
