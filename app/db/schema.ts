@@ -11,6 +11,8 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type RoleType = "admin" | "user";
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Answers {
@@ -86,7 +88,7 @@ export interface Users {
   created_at: Generated<Timestamp | null>;
   id: Generated<string>;
   name: string;
-  role: Generated<string>;
+  role: Generated<RoleType>;
 }
 
 export interface DB {

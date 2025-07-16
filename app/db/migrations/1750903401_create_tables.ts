@@ -1,14 +1,16 @@
-import { CompiledQuery, Kysely, sql } from "kysely";
+import { Kysely, sql } from "kysely";
 import { pool } from "../kasely";
 
 export async function up(db: Kysely<any>) {
+  await pool.query(`CREATE TYPE role_type AS ENUM ('user', 'admin');`);
+
   await db.schema
     .createTable("users")
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(sql`gen_random_uuid()`)
     )
     .addColumn("name", "text", (col) => col.notNull())
-    .addColumn("role", "text", (col) => col.notNull().defaultTo("user"))
+    .addColumn("role", sql`role_type`, (col) => col.notNull().defaultTo("user"))
     .addColumn("avatar_url", "text")
     .addColumn("created_at", "timestamp", (col) => col.defaultTo(sql`now()`))
     .execute();
@@ -138,4 +140,5 @@ export async function down(db: Kysely<any>) {
   await db.schema.dropTable("users").execute();
 
   await pool.query(`DROP TYPE IF EXISTS credential_type`);
+  await pool.query(`DROP TYPE IF EXISTS role_type`);
 }

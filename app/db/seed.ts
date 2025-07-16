@@ -12,8 +12,8 @@ async function main() {
     const { id: user_id } = await db()
       .insertInto("users")
       .values({
-        name: "Super Admin",
-        role: "super_admin",
+        name: "Admin",
+        role: "admin",
         created_at: new Date(),
       })
       .returning("id")
