@@ -14,9 +14,7 @@ export default function Auth() {
     <div>
       <div className="flex justify-center flex-col h-screen w-full">
         <h1 className="text-center font-bold text-3xl">QuizChamps</h1>
-        <Form method="POST">
-          <Outlet />
-        </Form>
+        <Outlet />
       </div>
     </div>
   );
