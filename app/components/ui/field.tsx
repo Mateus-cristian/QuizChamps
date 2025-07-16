@@ -3,7 +3,10 @@ import type { JSX } from "react";
 
 const Field = ({ className, ...props }: JSX.IntrinsicElements["div"]) => {
   return (
-    <div className={cn("flex flex-col space-y-2", className)} {...props} />
+    <div
+      className={cn("flex flex-col space-y-2 w-full", className)}
+      {...props}
+    />
   );
 };
 
