@@ -1,7 +1,7 @@
 import { fileURLToPath } from "url";
 import { dirname, resolve, join } from "path";
 import * as fs from "fs/promises";
-import { db } from "./kasely";
+import { db as createDb } from "./kasely";
 import { sql } from "kysely";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,48 +18,52 @@ async function getMigrationFiles() {
 }
 
 async function runMigrations(direction: "up" | "down") {
-  await db()
-    .schema.createTable("migrations")
-    .ifNotExists()
-    .addColumn("name", "text", (col) => col.primaryKey())
-    .addColumn("executed_at", "timestamp", (col) => col.defaultTo(sql`now()`))
-    .execute();
+  const db = createDb();
 
-  const executed = await db().selectFrom("migrations").select("name").execute();
-  const executedNames = new Set(executed.map((m) => m.name));
+  try {
+    await db.schema
+      .createTable("migrations")
+      .ifNotExists()
+      .addColumn("name", "text", (col) => col.primaryKey())
+      .addColumn("executed_at", "timestamp", (col) => col.defaultTo(sql`now()`))
+      .execute();
 
-  let files = await getMigrationFiles();
+    const executed = await db.selectFrom("migrations").select("name").execute();
+    const executedNames = new Set(executed.map((m) => m.name));
 
-  if (direction === "down") {
-    files = files
-      .filter((file) => executedNames.has(stripExtension(file)))
-      .reverse();
-  } else {
-    files = files.filter((file) => !executedNames.has(stripExtension(file)));
-  }
+    let files = await getMigrationFiles();
 
-  for (const file of files) {
-    const migration = await import(join(MIGRATIONS_PATH, file));
-    const fn = direction === "up" ? migration.up : migration.down;
-
-    console.log(`${direction.toUpperCase()}: ${file}`);
-    await fn(db);
-
-    const nameWithoutExt = stripExtension(file);
-    if (direction === "up") {
-      await db()
-        .insertInto("migrations")
-        .values({ name: nameWithoutExt })
-        .execute();
+    if (direction === "down") {
+      files = files
+        .filter((file) => executedNames.has(stripExtension(file)))
+        .reverse();
     } else {
-      await db()
-        .deleteFrom("migrations")
-        .where("name", "=", nameWithoutExt)
-        .execute();
+      files = files.filter((file) => !executedNames.has(stripExtension(file)));
     }
-  }
 
-  await db().destroy();
+    for (const file of files) {
+      const migration = await import(join(MIGRATIONS_PATH, file));
+      const fn = direction === "up" ? migration.up : migration.down;
+
+      console.log(`${direction.toUpperCase()}: ${file}`);
+      await fn(db);
+
+      const nameWithoutExt = stripExtension(file);
+      if (direction === "up") {
+        await db
+          .insertInto("migrations")
+          .values({ name: nameWithoutExt })
+          .execute();
+      } else {
+        await db
+          .deleteFrom("migrations")
+          .where("name", "=", nameWithoutExt)
+          .execute();
+      }
+    }
+  } finally {
+    await db.destroy();
+  }
 }
 
 const direction = process.argv[2] === "down" ? "down" : "up";

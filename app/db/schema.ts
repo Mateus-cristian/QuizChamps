@@ -5,6 +5,8 @@
 
 import type { ColumnType } from "kysely";
 
+export type CredentialType = "oauth" | "password";
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -65,13 +67,25 @@ export interface Quizzes {
   title: string;
 }
 
-export interface Users {
+export interface UserCredentials {
   created_at: Generated<Timestamp | null>;
   email: string;
+  email_verified: Generated<boolean | null>;
   id: Generated<string>;
-  is_verified: Generated<boolean | null>;
+  password_hash: string | null;
+  provider: string | null;
+  provider_id: string | null;
+  token_expires_at: Timestamp | null;
+  type: Generated<CredentialType>;
+  user_id: string;
+  verification_token: string | null;
+}
+
+export interface Users {
+  avatar_url: string | null;
+  created_at: Generated<Timestamp | null>;
+  id: Generated<string>;
   name: string;
-  password_hash: string;
   role: Generated<string>;
 }
 
@@ -83,5 +97,6 @@ export interface DB {
   questions: Questions;
   quiz_results: QuizResults;
   quizzes: Quizzes;
+  user_credentials: UserCredentials;
   users: Users;
 }
