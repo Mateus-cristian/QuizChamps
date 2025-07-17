@@ -2,13 +2,14 @@ import { applySchema, InputError } from "composable-functions";
 import { shemaSignIn, shemaSignUp } from "./auth.commom";
 import { db } from "@/db/kasely";
 import bcrypt from "bcryptjs";
+import { redirect } from "react-router";
 
 const SALT_ROUNDS = 10;
 
 const registerUser = applySchema(shemaSignUp)(
   async ({ email, name, password }) => {
     const user = await db()
-      .selectFrom("users")
+      .selectFrom("user_credentials")
       .where("email", "=", email)
       .execute();
 
@@ -17,15 +18,32 @@ const registerUser = applySchema(shemaSignUp)(
     }
 
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+    const trx = await db().startTransaction().execute();
 
-    await db()
-      .insertInto("users")
-      .values({
-        name,
-        email,
-        password_hash,
-      })
-      .execute();
+    try {
+      const { id: user_id } = await trx
+        .insertInto("users")
+        .values({
+          name,
+          role: "user",
+        })
+        .returning("id")
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto("user_credentials")
+        .values({
+          email,
+          password_hash,
+          user_id,
+          type: "password",
+        })
+        .executeTakeFirstOrThrow();
+
+      await trx.commit().execute();
+    } catch (error) {
+      await trx.rollback().execute();
+    }
 
     return true;
   }
@@ -33,12 +51,13 @@ const registerUser = applySchema(shemaSignUp)(
 
 const login = applySchema(shemaSignIn)(async ({ email, password }) => {
   const user = await db()
-    .selectFrom("users")
-    .selectAll()
+    .selectFrom("user_credentials as uc")
+    .innerJoin("users as u", "u.id", "uc.user_id")
+    .select(["email", "u.id", "u.name", "uc.password_hash", "email_verified"])
     .where("email", "=", email)
     .executeTakeFirst();
 
-  if (!user) {
+  if (!user || !user.password_hash) {
     throw new InputError("Invalid credentials");
   }
 
@@ -46,6 +65,10 @@ const login = applySchema(shemaSignIn)(async ({ email, password }) => {
 
   if (!isPasswordValid) {
     throw new InputError("Invalid credentials");
+  }
+
+  if (!user.email_verified) {
+    redirect("/send-confirmation-email");
   }
 
   return {

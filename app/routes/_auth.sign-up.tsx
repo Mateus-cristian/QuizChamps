@@ -36,15 +36,18 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!result.success) {
     return redirect(
       ".",
-      await setFlashMessage(request, "Usuário não encontrado", "warning")
+      await setFlashMessage(request, "Usuário não encontrado", "error")
     );
   }
 
-  return redirect("/auth/sign-in", {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
+  return redirect(
+    "/auth/sign-in",
+    await setFlashMessage(
+      request,
+      "Um e-mail de confirmação foi enviado para o endereço cadastrado.",
+      "success"
+    )
+  );
 }
 
 export default function Component() {
@@ -135,7 +138,11 @@ export default function Component() {
               </Field>
               <Errors />
               <Button>Cadastrar</Button>
-              <Button type="button" onClick={() => navigate(-1)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => navigate(-1)}
+              >
                 Voltar
               </Button>
             </div>
