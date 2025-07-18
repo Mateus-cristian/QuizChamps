@@ -35,23 +35,31 @@ export async function up(db: Kysely<any>) {
     .addColumn("provider", "text")
     .addColumn("provider_id", "text")
     .addColumn("email_verified", "boolean", (col) => col.defaultTo(false))
-    .addColumn("verification_token", "text")
-    .addColumn("token_expires_at", "timestamp")
     .addColumn("created_at", "timestamp", (col) => col.defaultTo(sql`now()`))
     .addUniqueConstraint("user_credentials_email_unique", ["email", "type"])
     .execute();
+
+  await pool.query(
+    `CREATE TYPE email_token_type AS ENUM ('email_verification', 'reset_password');`
+  );
 
   await db.schema
     .createTable("email_tokens")
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(sql`gen_random_uuid()`)
     )
-    .addColumn("user_id", "uuid", (col) =>
-      col.references("users.id").onDelete("cascade")
-    )
-    .addColumn("token", "text", (col) => col.notNull())
+    .addColumn("user_id", "uuid", (col) => col.notNull())
+    .addColumn("token", "text", (col) => col.notNull().unique())
+    .addColumn("type", sql`email_token_type`, (col) => col.notNull())
     .addColumn("expires_at", "timestamp", (col) => col.notNull())
-    .addColumn("used", "boolean", (col) => col.defaultTo(false))
+    .addColumn("created_at", "timestamp", (col) => col.defaultTo(sql`now()`))
+    .addForeignKeyConstraint(
+      "email_tokens_user_id_fk",
+      ["user_id"],
+      "users",
+      ["id"],
+      (cb) => cb.onDelete("cascade")
+    )
     .execute();
 
   await db.schema
@@ -141,4 +149,5 @@ export async function down(db: Kysely<any>) {
 
   await pool.query(`DROP TYPE IF EXISTS credential_type`);
   await pool.query(`DROP TYPE IF EXISTS role_type`);
+  await pool.query(`DROP TYPE IF EXISTS email_token_type`);
 }
