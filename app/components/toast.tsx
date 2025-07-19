@@ -8,6 +8,7 @@ type ToastType =
   | "loading"
   | "custom"
   | "warning"
+  | "blank"
   | "info";
 
 type Flash = {
@@ -87,6 +88,7 @@ export function ToastProvider({ flash }: ToastProviderProps) {
         custom: toast.custom,
         warning: toast.custom,
         info: toast.custom,
+        blank: toast.custom,
       };
 
       const toastMethod = toastMethods[flash.type] ?? toast;
