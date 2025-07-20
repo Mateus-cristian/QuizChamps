@@ -10,8 +10,9 @@ import {
 } from "react-router";
 import { SchemaForm } from "@/components/ui/schema-form";
 import { performMutation } from "remix-forms";
-import { login } from "@/domain/auth.server";
 import { setFlashMessage } from "@/utils/flash-messages";
+import { ERROR_CODES, extractCodeAndMessageError } from "@/utils/errors";
+import { login } from "@/domain/auth.server";
 
 export const meta: MetaFunction = () => [
   { title: "Login" },
@@ -30,13 +31,17 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!result.success) {
-    return redirect(
-      ".",
-      await setFlashMessage(request, "Usuário não encontrado", "error")
-    );
+    const { code, message } = extractCodeAndMessageError(result.errors);
+    const headers = await setFlashMessage(request, message, "error");
+
+    if (code === ERROR_CODES.EMAIL_NOT_VERIFIED) {
+      return redirect("/send-confirmation-email", headers);
+    }
+
+    return redirect(".", headers);
   }
 
-  redirect("home");
+  return redirect("/home");
 }
 
 export default function Component() {
@@ -56,7 +61,7 @@ export default function Component() {
       }}
       method="POST"
     >
-      {({ Field, Errors, Button }) => (
+      {({ Field, Button }) => (
         <>
           <div className="flex flex-col items-center">
             <div className="w-full max-w-[384px] flex flex-col gap-4 px-4 mt-12 ">

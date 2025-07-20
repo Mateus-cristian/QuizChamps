@@ -1,11 +1,11 @@
-import { applySchema, InputError } from "composable-functions";
+import { applySchema } from "composable-functions";
 import { schemaEmail, shemaSignIn, shemaSignUp } from "./auth.commom";
 import { db } from "@/db/kasely";
 import bcrypt from "bcryptjs";
-import { redirect } from "react-router";
 import { sendConfirmationEmail } from "./email.server";
 import { add } from "date-fns";
 import { randomUUID } from "crypto";
+import { AppError, ERROR_CODES } from "@/utils/errors";
 
 const SALT_ROUNDS = 10;
 
@@ -84,17 +84,17 @@ const login = applySchema(shemaSignIn)(async ({ email, password }) => {
     .executeTakeFirst();
 
   if (!user || !user.password_hash) {
-    throw new InputError("Invalid credentials");
+    throw AppError("Invalid credentials", ERROR_CODES.INVALID_CREDENTIALS);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
   if (!isPasswordValid) {
-    throw new InputError("Invalid credentials");
+    throw AppError("Invalid credentials", ERROR_CODES.INVALID_CREDENTIALS);
   }
 
   if (!user.email_verified) {
-    redirect("/send-confirmation-email");
+    throw AppError("Email not verified", ERROR_CODES.EMAIL_NOT_VERIFIED);
   }
 
   return {
