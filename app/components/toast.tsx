@@ -38,7 +38,7 @@ export function CustomToast({ type, message }: CustomToastProps) {
 
   return (
     <div
-      className="flex items-center px-3 py-3 bg-white text-neutral-800 rounded-lg shadow-lg w-[230px] max-w-[350px] pointer-events-auto "
+      className="flex items-center px-3 py-3 bg-white text-neutral-800 rounded-lg shadow-lg w-[230px] min-w-[350px] pointer-events-auto "
       style={{
         boxShadow:
           "0 3px 10px rgba(0, 0, 0, 0.1), 0 3px 3px rgba(0, 0, 0, 0.05)",
@@ -99,5 +99,5 @@ export function ToastProvider({ flash }: ToastProviderProps) {
     });
   }, [flash]);
 
-  return <Toaster position="top-right" />;
+  return <Toaster position="bottom-right" />;
 }
