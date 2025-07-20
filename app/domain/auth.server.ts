@@ -1,22 +1,29 @@
 import { applySchema, InputError } from "composable-functions";
-import { shemaSignIn, shemaSignUp } from "./auth.commom";
+import { schemaEmail, shemaSignIn, shemaSignUp } from "./auth.commom";
 import { db } from "@/db/kasely";
 import bcrypt from "bcryptjs";
 import { redirect } from "react-router";
+import { sendConfirmationEmail } from "./email.server";
+import { add } from "date-fns";
+import { randomUUID } from "crypto";
 
 const SALT_ROUNDS = 10;
 
+const isUserNotExists = applySchema(schemaEmail)(async ({ email }) => {
+  const user = await db()
+    .selectFrom("user_credentials")
+    .where("email", "=", email)
+    .executeTakeFirst();
+
+  if (user) {
+    throw new Error();
+  }
+
+  return true;
+});
+
 const registerUser = applySchema(shemaSignUp)(
   async ({ email, name, password }) => {
-    const user = await db()
-      .selectFrom("user_credentials")
-      .where("email", "=", email)
-      .execute();
-
-    if (user) {
-      throw new InputError("user already exists");
-    }
-
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
     const trx = await db().startTransaction().execute();
 
@@ -40,9 +47,28 @@ const registerUser = applySchema(shemaSignUp)(
         })
         .executeTakeFirstOrThrow();
 
+      const expiresAtDate = add(new Date(), {
+        days: 1,
+      });
+
+      const token = randomUUID();
+
+      await trx
+        .insertInto("email_tokens")
+        .values({
+          type: "email_verification",
+          token,
+          user_id,
+          expires_at: expiresAtDate,
+        })
+        .executeTakeFirstOrThrow();
+
       await trx.commit().execute();
+
+      await sendConfirmationEmail({ email, name, token });
     } catch (error) {
       await trx.rollback().execute();
+      throw new Error();
     }
 
     return true;
@@ -78,4 +104,4 @@ const login = applySchema(shemaSignIn)(async ({ email, password }) => {
   };
 });
 
-export { registerUser, login };
+export { registerUser, isUserNotExists, login };

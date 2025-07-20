@@ -1,5 +1,5 @@
 import { SchemaForm } from "@/components/ui/schema-form";
-import { shemaSignUp } from "@/domain/auth.commom";
+import { schemaEmail, shemaSignUp } from "@/domain/auth.commom";
 import { eyePassword } from "@/domain/auth.ui";
 import { useState } from "react";
 import {
@@ -9,8 +9,7 @@ import {
   type MetaFunction,
 } from "react-router";
 import { performMutation } from "remix-forms";
-import { registerUser } from "@/domain/auth.server";
-import { sessionStorage } from "@/session";
+import { isUserNotExists, registerUser } from "@/domain/auth.server";
 import { setFlashMessage } from "@/utils/flash-messages";
 
 export const meta: MetaFunction = () => [
@@ -23,25 +22,42 @@ export function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const isUserNotExistsResult = await performMutation({
+    request,
+    schema: schemaEmail,
+    mutation: isUserNotExists,
+  });
+
+  if (!isUserNotExistsResult.success) {
+    return redirect(
+      ".",
+      await setFlashMessage(
+        request,
+        "Este e-mail já está cadastrado. Se você esqueceu sua senha, redefina-a para acessar sua conta.",
+        "warning"
+      )
+    );
+  }
+
   const result = await performMutation({
     request,
     schema: shemaSignUp,
     mutation: registerUser,
   });
 
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-
   if (!result.success) {
     return redirect(
       ".",
-      await setFlashMessage(request, "Usuário não encontrado", "error")
+      await setFlashMessage(
+        request,
+        "Ocorreu um erro ao criar o usuário,tente novamente,caso persista contate suporte",
+        "error"
+      )
     );
   }
 
   return redirect(
-    "/auth/sign-in",
+    "/sign-in",
     await setFlashMessage(
       request,
       "Um e-mail de confirmação foi enviado para o endereço cadastrado.",

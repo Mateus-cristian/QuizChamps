@@ -7,6 +7,8 @@ import type { ColumnType } from "kysely";
 
 export type CredentialType = "oauth" | "password";
 
+export type EmailTokenType = "email_verification" | "reset_password";
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -25,11 +27,12 @@ export interface Answers {
 }
 
 export interface EmailTokens {
+  created_at: Generated<Timestamp | null>;
   expires_at: Timestamp;
   id: Generated<string>;
   token: string;
-  used: Generated<boolean | null>;
-  user_id: string | null;
+  type: EmailTokenType;
+  user_id: string;
 }
 
 export interface Migrations {
@@ -77,10 +80,8 @@ export interface UserCredentials {
   password_hash: string | null;
   provider: string | null;
   provider_id: string | null;
-  token_expires_at: Timestamp | null;
   type: Generated<CredentialType>;
   user_id: string;
-  verification_token: string | null;
 }
 
 export interface Users {
