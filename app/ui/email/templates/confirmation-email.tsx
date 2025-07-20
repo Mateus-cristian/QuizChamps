@@ -9,10 +9,10 @@ import {
 
 type Props = {
   name: string;
-  confirmUrl: string;
+  token: string;
 };
 
-function ConfirmationEmail({ name, confirmUrl }: Props) {
+function ConfirmationEmail({ name, token }: Props) {
   return (
     <Html>
       <Head />
@@ -29,7 +29,7 @@ function ConfirmationEmail({ name, confirmUrl }: Props) {
           <Text>Olá {name},</Text>
           <Text>Confirme seu e-mail clicando no botão abaixo:</Text>
           <Button
-            href={confirmUrl}
+            href={`http://localhost:5173/sign-in?${token}`}
             style={{
               backgroundColor: "#ff6600",
               color: "#ffffff",

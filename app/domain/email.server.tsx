@@ -1,5 +1,5 @@
 import { env } from "@/env.server";
-import nodemailer from "nodemailer";
+import nodemailer, { getTestMessageUrl } from "nodemailer";
 import { render } from "@react-email/render";
 import type { JSX } from "react";
 import type Mail from "nodemailer/lib/mailer";
@@ -29,7 +29,7 @@ async function sendEmail({
       text,
     });
 
-    const previewUrl = require("nodemailer").getTestMessageUrl(mail);
+    const previewUrl = getTestMessageUrl(mail);
     console.log("📧 Email enviado. Preview:", previewUrl);
     return previewUrl;
   } catch (error) {
@@ -41,16 +41,16 @@ async function sendEmail({
 async function sendConfirmationEmail({
   email,
   name,
-  confirmUrl,
+  token,
 }: {
   email: string;
   name: string;
-  confirmUrl: string;
+  token: string;
 }) {
   await sendEmail({
     to: email,
     subject: "Confirme seu e-mail",
-    element: <ConfirmationEmail name={name} confirmUrl={confirmUrl} />,
+    element: <ConfirmationEmail name={name} token={token} />,
   });
 }
 
