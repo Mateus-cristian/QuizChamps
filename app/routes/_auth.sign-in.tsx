@@ -11,8 +11,8 @@ import {
 import { SchemaForm } from "@/components/ui/schema-form";
 import { performMutation } from "remix-forms";
 import { setFlashMessage } from "@/utils/flash-messages";
-import { ERROR_CODES, extractCodeAndMessageError } from "@/utils/errors";
-import { login } from "@/domain/auth.server";
+import { login, sendConfirmationEmailAgain } from "@/domain/auth.server";
+import { inputFromForm } from "composable-functions";
 
 export const meta: MetaFunction = () => [
   { title: "Login" },
@@ -24,6 +24,7 @@ export function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const { email } = await inputFromForm(request);
   const result = await performMutation({
     request,
     schema: shemaSignIn,
@@ -31,14 +32,20 @@ export async function action({ request }: ActionFunctionArgs) {
   });
 
   if (!result.success) {
-    const { code, message } = extractCodeAndMessageError(result.errors);
-    const headers = await setFlashMessage(request, message, "error");
+    return redirect(
+      `.`,
+      await setFlashMessage(
+        request,
+        "E-mail ou senha incorretos. Por favor, tente novamente.",
+        "error"
+      )
+    );
+  }
 
-    if (code === ERROR_CODES.EMAIL_NOT_VERIFIED) {
-      return redirect("/send-confirmation-email", headers);
-    }
+  const confirmation = await sendConfirmationEmailAgain(email as string);
 
-    return redirect(".", headers);
+  if (confirmation.success) {
+    redirect(`/send-confirmation-email/${confirmation.data.id}`);
   }
 
   return redirect("/home");

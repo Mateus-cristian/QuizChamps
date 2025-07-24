@@ -2,10 +2,10 @@
 
 import type { GetInfo, GetAnnotations } from "react-router/internal";
 
-type Module = typeof import("../_auth.send-confirmation-email.js")
+type Module = typeof import("../_auth.send-confirmation-email.$id.js")
 
 type Info = GetInfo<{
-  file: "routes/_auth.send-confirmation-email.tsx",
+  file: "routes/_auth.send-confirmation-email.$id.tsx",
   module: Module
 }>
 
@@ -16,8 +16,8 @@ type Matches = [{
   id: "routes/_auth";
   module: typeof import("../_auth.js");
 }, {
-  id: "routes/_auth.send-confirmation-email";
-  module: typeof import("../_auth.send-confirmation-email.js");
+  id: "routes/_auth.send-confirmation-email.$id";
+  module: typeof import("../_auth.send-confirmation-email.$id.js");
 }];
 
 type Annotations = GetAnnotations<Info & { module: Module, matches: Matches }>;

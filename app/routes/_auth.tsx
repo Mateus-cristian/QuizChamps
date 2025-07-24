@@ -1,4 +1,4 @@
-import { Form, Outlet, type MetaFunction } from "react-router";
+import { Outlet, type MetaFunction } from "react-router";
 
 export const meta: MetaFunction = () => [
   { title: "New React Router App" },

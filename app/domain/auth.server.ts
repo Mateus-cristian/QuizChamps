@@ -1,11 +1,10 @@
-import { applySchema } from "composable-functions";
+import { applySchema, composable } from "composable-functions";
 import { schemaEmail, shemaSignIn, shemaSignUp } from "./auth.commom";
 import { db } from "@/db/kasely";
 import bcrypt from "bcryptjs";
 import { sendConfirmationEmail } from "./email.server";
 import { add } from "date-fns";
 import { randomUUID } from "crypto";
-import { AppError, ERROR_CODES } from "@/utils/errors";
 
 const SALT_ROUNDS = 10;
 
@@ -84,17 +83,13 @@ const login = applySchema(shemaSignIn)(async ({ email, password }) => {
     .executeTakeFirst();
 
   if (!user || !user.password_hash) {
-    throw AppError("Invalid credentials", ERROR_CODES.INVALID_CREDENTIALS);
+    throw new Error("E-mail ou senha incorretos. Por favor, tente novamente.");
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
   if (!isPasswordValid) {
-    throw AppError("Invalid credentials", ERROR_CODES.INVALID_CREDENTIALS);
-  }
-
-  if (!user.email_verified) {
-    throw AppError("Email not verified", ERROR_CODES.EMAIL_NOT_VERIFIED);
+    throw new Error("E-mail ou senha incorretos. Por favor, tente novamente.");
   }
 
   return {
@@ -104,4 +99,39 @@ const login = applySchema(shemaSignIn)(async ({ email, password }) => {
   };
 });
 
-export { registerUser, isUserNotExists, login };
+const sendConfirmationEmailAgain = composable(async (email: string) => {
+  const user = await db()
+    .selectFrom("email_tokens as et")
+    .innerJoin("user_credentials as uc", "uc.id", "et.user_id")
+    .where("uc.email", "=", email)
+    .where("uc.email_verified", "=", false)
+    .select(["id", "uc.user_id"])
+    .executeTakeFirstOrThrow();
+
+  if (!user) {
+    throw new Error("Email já verificado!");
+  }
+
+  const expiresAtDate = add(new Date(), {
+    days: 1,
+  });
+
+  const token = randomUUID();
+
+  const { id } = await db()
+    .insertInto("email_tokens")
+    .values({
+      type: "email_verification",
+      token,
+      user_id: user.user_id,
+      expires_at: expiresAtDate,
+    })
+    .returning("id")
+    .executeTakeFirstOrThrow();
+
+  return {
+    id,
+  };
+});
+
+export { registerUser, isUserNotExists, login, sendConfirmationEmailAgain };

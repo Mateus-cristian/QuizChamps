@@ -13,8 +13,10 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/send-confirmation-email": {
-    params: {};
+  "/send-confirmation-email/:id": {
+    params: {
+      "id": string;
+    };
   };
   "/reset-password/:token": {
     params: {
@@ -40,7 +42,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/send-confirmation-email" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up";
+    page: "/" | "/send-confirmation-email/:id" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -48,11 +50,11 @@ type RouteFiles = {
   };
   "routes/_auth.tsx": {
     id: "routes/_auth";
-    page: "/send-confirmation-email" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up" | "/";
+    page: "/send-confirmation-email/:id" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up" | "/";
   };
-  "routes/_auth.send-confirmation-email.tsx": {
-    id: "routes/_auth.send-confirmation-email";
-    page: "/send-confirmation-email";
+  "routes/_auth.send-confirmation-email.$id.tsx": {
+    id: "routes/_auth.send-confirmation-email.$id";
+    page: "/send-confirmation-email/:id";
   };
   "routes/_auth.reset-password.$token.tsx": {
     id: "routes/_auth.reset-password.$token";
