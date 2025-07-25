@@ -11,7 +11,10 @@ import {
 import { SchemaForm } from "@/components/ui/schema-form";
 import { performMutation } from "remix-forms";
 import { setFlashMessage } from "@/utils/flash-messages";
-import { login, sendConfirmationEmailAgain } from "@/domain/auth.server";
+import {
+  login,
+  resendVerificationEmailIfNotVerified,
+} from "@/domain/auth.server";
 import { inputFromForm } from "composable-functions";
 
 export const meta: MetaFunction = () => [
@@ -25,6 +28,7 @@ export function loader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const { email } = await inputFromForm(request);
+
   const result = await performMutation({
     request,
     schema: shemaSignIn,
@@ -33,7 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (!result.success) {
     return redirect(
-      `.`,
+      ".",
       await setFlashMessage(
         request,
         "E-mail ou senha incorretos. Por favor, tente novamente.",
@@ -42,13 +46,15 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const confirmation = await sendConfirmationEmailAgain(email as string);
+  const confirmation = await resendVerificationEmailIfNotVerified(
+    email as string
+  );
 
   if (confirmation.success) {
-    redirect(`/send-confirmation-email/${confirmation.data.id}`);
+    return redirect(`/send-confirmation-email/${confirmation.data.token}`);
   }
 
-  return redirect("/home");
+  return redirect("/dashboard");
 }
 
 export default function Component() {

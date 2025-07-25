@@ -1,13 +1,57 @@
 import { Button } from "@/components/ui/button";
-import { Form, useNavigate, type MetaFunction } from "react-router";
+import { resendVerificationUsingToken } from "@/domain/auth.server";
+import { setFlashMessage } from "@/utils/flash-messages";
+import {
+  Form,
+  redirect,
+  useNavigate,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "react-router";
 
 export const meta: MetaFunction = () => [
   { title: "Register" },
   { name: "register", content: "Page for register user" },
 ];
 
-export function loader() {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const token = params.id;
+
+  if (!token) {
+    return redirect(
+      "/sign-in",
+      await setFlashMessage(request, "Token inválido ou ausente.", "error")
+    );
+  }
+
   return null;
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const token = params.id;
+
+  if (!token) {
+    return redirect(
+      "/sign-in",
+      await setFlashMessage(request, "Token inválido ou ausente.", "error")
+    );
+  }
+
+  const result = await resendVerificationUsingToken(token);
+
+  if (result.success) {
+    return redirect(
+      `/sign-in`,
+      await setFlashMessage(
+        request,
+        "Um e-mail de confirmação foi enviado para o endereço cadastrado.",
+        "success"
+      )
+    );
+  }
+
+  return redirect(".");
 }
 
 export default function Component() {

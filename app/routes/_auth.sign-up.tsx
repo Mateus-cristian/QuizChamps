@@ -9,7 +9,7 @@ import {
   type MetaFunction,
 } from "react-router";
 import { performMutation } from "remix-forms";
-import { isUserNotExists, registerUser } from "@/domain/auth.server";
+import { ensureEmailNotInUse, registerUser } from "@/domain/auth.server";
 import { setFlashMessage } from "@/utils/flash-messages";
 
 export const meta: MetaFunction = () => [
@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const isUserNotExistsResult = await performMutation({
     request,
     schema: schemaEmail,
-    mutation: isUserNotExists,
+    mutation: ensureEmailNotInUse,
   });
 
   if (!isUserNotExistsResult.success) {
