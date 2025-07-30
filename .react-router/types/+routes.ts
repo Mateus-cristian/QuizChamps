@@ -13,6 +13,11 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/quizchamps/confirmation-email/:token": {
+    params: {
+      "token": string;
+    };
+  };
   "/send-confirmation-email/:id": {
     params: {
       "id": string;
@@ -42,11 +47,15 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/send-confirmation-email/:id" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up";
+    page: "/" | "/quizchamps/confirmation-email/:token" | "/send-confirmation-email/:id" | "/reset-password/:token" | "/verify-token/:token" | "/forgot-password" | "/sign-in" | "/sign-up";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
+  };
+  "resource-routes/email/confirmation-token.$token.ts": {
+    id: "resource-routes/email/confirmation-token.$token";
+    page: "/quizchamps/confirmation-email/:token";
   };
   "routes/_auth.tsx": {
     id: "routes/_auth";
