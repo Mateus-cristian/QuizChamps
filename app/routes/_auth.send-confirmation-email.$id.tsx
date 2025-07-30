@@ -1,11 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { resendVerificationUsingToken } from "@/domain/auth.server";
-import { setFlashMessage } from "@/utils/flash-messages";
 import {
   Form,
-  redirect,
   useNavigate,
-  type ActionFunctionArgs,
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "react-router";
@@ -15,43 +12,11 @@ export const meta: MetaFunction = () => [
   { name: "register", content: "Page for register user" },
 ];
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const token = params.id;
-
-  if (!token) {
-    return redirect(
-      "/sign-in",
-      await setFlashMessage(request, "Token inválido ou ausente.", "error")
-    );
-  }
+export async function loader({ params }: LoaderFunctionArgs) {
+  const token = params.id as string;
+  await resendVerificationUsingToken(token);
 
   return null;
-}
-
-export async function action({ request, params }: ActionFunctionArgs) {
-  const token = params.id;
-
-  if (!token) {
-    return redirect(
-      "/sign-in",
-      await setFlashMessage(request, "Token inválido ou ausente.", "error")
-    );
-  }
-
-  const result = await resendVerificationUsingToken(token);
-
-  if (result.success) {
-    return redirect(
-      `/sign-in`,
-      await setFlashMessage(
-        request,
-        "Um e-mail de confirmação foi enviado para o endereço cadastrado.",
-        "success"
-      )
-    );
-  }
-
-  return redirect(".");
 }
 
 export default function Component() {
@@ -64,11 +29,8 @@ export default function Component() {
           <p className="text-2xl font-medium text-center">
             Um e-mail de confirmação foi enviado para o endereço cadastrado.
           </p>
-          <Button type="submit" className="cursor-pointer mt-5">
-            Reenviar email de confirmação
-          </Button>
           <Button
-            variant={"secondary"}
+            variant={"default"}
             type="button"
             onClick={() => navigate("/sign-in")}
           >

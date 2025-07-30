@@ -159,7 +159,7 @@ const verifyLatestEmailToken = composable(async (token: string) => {
     .select(["id", "user_id"])
     .executeTakeFirst();
 
-  if (!found) throw new Error("Token inválido ou expirado.");
+  if (!found) throw new Error("Token inválido.");
 
   return found;
 });
@@ -167,16 +167,18 @@ const verifyLatestEmailToken = composable(async (token: string) => {
 const confirmEmailVerification = composable(async (token: string) => {
   const tokenData = await fromSuccess(verifyLatestEmailToken)(token);
 
+  const user = await db()
+    .selectFrom("user_credentials")
+    .where("user_id", "=", tokenData.user_id)
+    .where("email_verified", "=", true)
+    .executeTakeFirst();
+
+  if (user) throw new Error("Usuário já verificado.");
+
   await db()
     .updateTable("user_credentials")
     .where("user_id", "=", tokenData.user_id)
     .set({ email_verified: true })
-    .execute();
-
-  await db()
-    .deleteFrom("email_tokens")
-    .where("user_id", "=", tokenData.user_id)
-    .where("type", "=", "email_verification")
     .execute();
 
   return { success: true };

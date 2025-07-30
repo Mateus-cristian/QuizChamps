@@ -29,7 +29,7 @@ function ConfirmationEmail({ name, token }: Props) {
           <Text>Olá {name},</Text>
           <Text>Confirme seu e-mail clicando no botão abaixo:</Text>
           <Button
-            href={`http://localhost:5173/sign-in?${token}`}
+            href={`http://localhost:5173/quizchamps/confirmation-email/${token}`}
             style={{
               backgroundColor: "#ff6600",
               color: "#ffffff",
