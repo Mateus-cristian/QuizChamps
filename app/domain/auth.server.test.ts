@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
 import * as authServer from "./auth.server";
 import { db } from "@/db/kasely";
-import { createUserDirect, fakeUser, getFakeUser } from "@/test/fake-data";
+import { createUserDirect, fakeUser } from "@/test/fake-data";
 import { fromSuccess } from "composable-functions";
 
 vi.mock("nodemailer", () => ({
