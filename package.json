@@ -10,10 +10,12 @@
     "typecheck": "react-router typegen && tsc",
     "migrate:up": "tsx app/db/migrate.ts up",
     "migrate:down": "tsx app/db/migrate.ts down",
-    "kysely:migrations": "yarn tsx app/db/migrate.ts",
+    "kysely:migrations": "yarn tsx scripts/migrate-main-db.ts",
     "kysely:generate": "kysely-codegen --out-file app/db/schema.ts",
     "fake-email": "yarn tsx app/scripts/create-ethereal-account.ts",
-    "worker:mail": "tsx app/workers/mail.worker.ts"
+    "worker:mail": "tsx app/workers/mail.worker.ts",
+    "test:prepare": "tsx scripts/migrate-test-db.ts",
+    "test": "npm run test:prepare && vitest"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",
@@ -80,6 +82,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

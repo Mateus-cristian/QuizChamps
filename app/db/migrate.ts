@@ -17,7 +17,7 @@ async function getMigrationFiles() {
   return files.filter((file) => file.endsWith(".ts")).sort();
 }
 
-async function runMigrations(direction: "up" | "down") {
+export async function runMigrations(direction: "up" | "down") {
   const db = createDb();
 
   try {
@@ -65,12 +65,3 @@ async function runMigrations(direction: "up" | "down") {
     await db.destroy();
   }
 }
-
-const direction = process.argv[2] === "down" ? "down" : "up";
-
-runMigrations(direction)
-  .then(() => console.log(`✅ Migration ${direction} complete.`))
-  .catch((err) => {
-    console.error("❌ Migration failed:", err);
-    process.exit(1);
-  });
