@@ -48,7 +48,6 @@ const registerUser = applySchema(shemaSignUp)(
       await trx.rollback().execute();
       throw new Error("Erro ao registrar usuário.");
     }
-
     return true;
   }
 );
@@ -233,4 +232,5 @@ export {
   confirmEmailVerification,
   resendVerificationEmailIfNotVerified,
   resendVerificationUsingToken,
+  generateEmailVerificationTokenData,
 };
